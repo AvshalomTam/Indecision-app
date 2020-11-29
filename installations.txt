@@ -1,0 +1,19 @@
+// global dependencies - give us the excess commands: yarn or babel
+
+// to reinstall node_modules - run: yarn install
+
+npm install -g live-server
+// make live server pop up in the browser
+live-server public 
+// install babel - compailer from jsx to old javascript code!
+npm install -g babel-cli@6.24.1
+
+// local dependencies - locally in our projet
+= need their code to live in our project 
+yarm init (= npm init)
+
+// install dependencies
+yarn add babel-preset-react@6.24.1 babel-preset-env@1.5.2
+
+// take jsx and es6 code and compile it to something the browser understands
+babel src/app.js --out-file=public/scripts/app.js --presets=env,react
