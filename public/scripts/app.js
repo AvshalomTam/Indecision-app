@@ -23,18 +23,63 @@ var IndecisionApp = function (_React$Component) {
         _this.hanleDeleteOptions = _this.hanleDeleteOptions.bind(_this);
         _this.handlePic = _this.handlePic.bind(_this);
         _this.handleAddOption = _this.handleAddOption.bind(_this);
+        _this.hanleDeleteOption = _this.hanleDeleteOption.bind(_this);
         _this.state = {
-            options: props.options
+            options: []
         };
         return _this;
     }
+    // lifecicle method - gets called when the component first get called to the DOM
+
 
     _createClass(IndecisionApp, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            try {
+                var json = localStorage.getItem('options');
+                var options = JSON.parse(json);
+
+                if (options) {
+                    this.setState(function () {
+                        return { options: options };
+                    });
+                }
+            } catch (e) {
+                // Do nothing at all
+            }
+        }
+    }, {
+        key: 'componentDidUpdate',
+
+        // lifecicle method - gets called after the props/state changes
+        value: function componentDidUpdate(prevProps, prevState) {
+            if (prevState.options.length !== this.state.options.length) {
+                var json = JSON.stringify(this.state.options);
+                localStorage.setItem('options', json);
+            }
+        }
+    }, {
+        key: 'componentWillUnmount',
+
+        // lifecicle method - gets called before component goes away
+        value: function componentWillUnmount() {
+            console.log('componentWillUnmount');
+        }
+    }, {
         key: 'hanleDeleteOptions',
         value: function hanleDeleteOptions() {
             this.setState(function () {
+                return { options: [] };
+            });
+        }
+    }, {
+        key: 'hanleDeleteOption',
+        value: function hanleDeleteOption(optionToRemove) {
+            this.setState(function (prevState) {
                 return {
-                    options: []
+                    options: prevState.options.filter(function (option) {
+                        return option !== optionToRemove;
+                    })
                 };
             });
         }
@@ -76,7 +121,8 @@ var IndecisionApp = function (_React$Component) {
                 }),
                 React.createElement(Options, {
                     options: this.state.options,
-                    hanleDeleteOptions: this.hanleDeleteOptions
+                    hanleDeleteOptions: this.hanleDeleteOptions,
+                    hanleDeleteOption: this.hanleDeleteOption
                 }),
                 React.createElement(AddOption, {
                     handleAddOption: this.handleAddOption
@@ -89,10 +135,6 @@ var IndecisionApp = function (_React$Component) {
 }(React.Component);
 
 ;
-
-IndecisionApp.defaultProps = {
-    options: []
-};
 
 var Header = function Header(props) {
     return React.createElement(
@@ -140,8 +182,16 @@ var Options = function Options(props) {
             { onClick: props.hanleDeleteOptions },
             'Remove All'
         ),
+        props.options.length === 0 && React.createElement(
+            'p',
+            null,
+            'Please add an option to get started!'
+        ),
         props.options.map(function (option) {
-            return React.createElement(Option, { key: option, optionText: option });
+            return React.createElement(Option, {
+                key: option,
+                optionText: option,
+                hanleDeleteOption: props.hanleDeleteOption });
         })
     );
 };
@@ -150,8 +200,15 @@ var Option = function Option(props) {
     return React.createElement(
         'div',
         null,
-        'Option: ',
-        props.optionText
+        props.optionText,
+        React.createElement(
+            'button',
+            {
+                onClick: function onClick(e) {
+                    props.hanleDeleteOption(props.optionText);
+                } },
+            'Remove'
+        )
     );
 };
 
@@ -181,6 +238,10 @@ var AddOption = function (_React$Component2) {
             this.setState(function () {
                 return { error: error };
             });
+
+            if (!error) {
+                e.target.elements.option.value = '';
+            }
         }
     }, {
         key: 'render',

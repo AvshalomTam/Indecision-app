@@ -8,17 +8,46 @@ class IndecisionApp extends React.Component {
         this.hanleDeleteOptions = this.hanleDeleteOptions.bind(this);
         this.handlePic = this.handlePic.bind(this);
         this.handleAddOption = this.handleAddOption.bind(this);
+        this.hanleDeleteOption = this.hanleDeleteOption.bind(this);
         this.state = {
-            options: props.options
+            options: []
         };
+    }
+    // lifecicle method - gets called when the component first get called to the DOM
+    componentDidMount() {
+        try {
+            const json = localStorage.getItem('options');
+            const options = JSON.parse(json);
+
+            if (options) {
+                this.setState(() => ({options}));
+            } 
+
+        } catch (e) {
+            // Do nothing at all
+        }    
+    };
+    // lifecicle method - gets called after the props/state changes
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.options.length !== this.state.options.length) {
+            const json = JSON.stringify(this.state.options);
+            localStorage.setItem('options', json);        }
+
+    };
+    // lifecicle method - gets called before component goes away
+    componentWillUnmount() {
+        console.log('componentWillUnmount');
     }
 
     hanleDeleteOptions() {
-        this.setState(() => {
-            return {
-                options: []
-            };
-        });
+        this.setState(() => ({options: []}));
+    }
+
+    hanleDeleteOption(optionToRemove) {
+        this.setState((prevState) => ({
+            options: prevState.options.filter(
+                (option) => {return option !== optionToRemove;})
+        }))
     }
 
     handlePic() {
@@ -34,11 +63,9 @@ class IndecisionApp extends React.Component {
             return 'This option already exists';
         } 
 
-        this.setState((prevState) => {
-            return {
-                options: prevState.options.concat(option)
-            };
-        });
+        this.setState((prevState) => ({
+            options: prevState.options.concat(option)
+        }));
     }
 
     render() {
@@ -54,7 +81,8 @@ class IndecisionApp extends React.Component {
                 />
                 <Options 
                 options={this.state.options} 
-                hanleDeleteOptions={this.hanleDeleteOptions} 
+                hanleDeleteOptions={this.hanleDeleteOptions}
+                hanleDeleteOption = {this.hanleDeleteOption}
                 />
                 <AddOption 
                 handleAddOption={this.handleAddOption}
@@ -62,10 +90,6 @@ class IndecisionApp extends React.Component {
             </div>
         );
     };
-};
-
-IndecisionApp.defaultProps = {
-    options: []
 };
 
 const Header = (props) => {
@@ -99,8 +123,14 @@ const Options = (props) => {
         <div>
             Your Options:
             <button onClick={props.hanleDeleteOptions}>Remove All</button>
+            {props.options.length === 0 && <p>Please add an option to get started!</p>}
             {
-                props.options.map((option) => <Option key={option} optionText={option}/>)
+                props.options.map((option) => (
+                    <Option 
+                    key={option} 
+                    optionText={option}
+                    hanleDeleteOption = {props.hanleDeleteOption}/>
+                ))
             }
         </div>
     );
@@ -109,7 +139,13 @@ const Options = (props) => {
 const Option = (props) => {
     return (
         <div>
-           Option: {props.optionText}
+           {props.optionText}
+           <button 
+           onClick={(e) => {
+               props.hanleDeleteOption(props.optionText)
+           }}>
+           Remove
+           </button>
         </div>
     );
 };
@@ -128,9 +164,11 @@ class AddOption extends React.Component {
         const option = e.target.elements.option.value.trim();
         const error = this.props.handleAddOption(option);
         
-        this.setState(() => {
-            return { error };
-        });
+        this.setState(() => ({ error }));
+
+        if (!error) {
+            e.target.elements.option.value = '';
+        }
     };
     render() {
         return (
