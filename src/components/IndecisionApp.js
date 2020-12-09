@@ -6,16 +6,39 @@ import Action from './Action';
 import Options from './Options';
 
 export default class IndecisionApp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.hanleDeleteOptions = this.hanleDeleteOptions.bind(this);
-        this.handlePic = this.handlePic.bind(this);
-        this.handleAddOption = this.handleAddOption.bind(this);
-        this.hanleDeleteOption = this.hanleDeleteOption.bind(this);
-        this.state = {
-            options: []
-        };
-    }
+    state = {
+        options: []
+    };
+
+    hanleDeleteOptions = () => {
+        this.setState(() => ({options: []}));
+    };
+
+    hanleDeleteOption = (optionToRemove) => {
+        this.setState((prevState) => ({
+            options: prevState.options.filter(
+                (option) => {return option !== optionToRemove;})
+        }))
+    };
+
+    handlePic = () => {
+        const randomNum = Math.floor(Math.random() * this.state.options.length);
+        const option = this.state.options[randomNum];
+        alert(option);
+    };
+
+    handleAddOption = (option) => {
+        if (!option) {
+            return 'Enter valid value to add item';
+        } else if (this.state.options.indexOf(option) > -1) {
+            return 'This option already exists';
+        } 
+
+        this.setState((prevState) => ({
+            options: prevState.options.concat(option)
+        }));
+    };
+
     // lifecicle method - gets called when the component first get called to the DOM
     componentDidMount() {
         try {
@@ -40,35 +63,6 @@ export default class IndecisionApp extends React.Component {
     // lifecicle method - gets called before component goes away
     componentWillUnmount() {
         console.log('componentWillUnmount');
-    }
-
-    hanleDeleteOptions() {
-        this.setState(() => ({options: []}));
-    }
-
-    hanleDeleteOption(optionToRemove) {
-        this.setState((prevState) => ({
-            options: prevState.options.filter(
-                (option) => {return option !== optionToRemove;})
-        }))
-    }
-
-    handlePic() {
-        const randomNum = Math.floor(Math.random() * this.state.options.length);
-        const option = this.state.options[randomNum];
-        alert(option);
-    }
-
-    handleAddOption(option) {
-        if (!option) {
-            return 'Enter valid value to add item';
-        } else if (this.state.options.indexOf(option) > -1) {
-            return 'This option already exists';
-        } 
-
-        this.setState((prevState) => ({
-            options: prevState.options.concat(option)
-        }));
     }
 
     render() {
