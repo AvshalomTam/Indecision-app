@@ -1,6 +1,9 @@
 # ignore modules #
 ###################
 node_modules/
-# ignore saved installations #
+# ignore test files #
+###################
+src/playground
+# ignore txt files #
 ###################
 *.txt
