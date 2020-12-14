@@ -5,7 +5,7 @@ Let your computer decide what to do next!<br />
 
 ## Run the App
 For running the app, follow those steps:<br />
-1. run the following commands inside the main folder: 
+1. Run the following commands inside the main folder: 
 ``` bash
 # install dependencies
 yarn install
